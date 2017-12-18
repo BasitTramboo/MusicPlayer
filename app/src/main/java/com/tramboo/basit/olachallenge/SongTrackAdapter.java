@@ -5,10 +5,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.squareup.picasso.Picasso;
+import com.bumptech.glide.Glide;
 import com.tramboo.basit.olachallenge.model.Songs;
 
 import java.util.List;
@@ -43,7 +44,7 @@ public class SongTrackAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        Songs track = getItem(position);
+        final Songs track = getItem(position);
         ViewHolder viewHolder = null;
 
         if (convertView == null){
@@ -52,14 +53,21 @@ public class SongTrackAdapter extends BaseAdapter {
             viewHolder.trackImageView = convertView.findViewById(R.id.coverImage);
             viewHolder.titleTextView = convertView.findViewById(R.id.songName);
             viewHolder.artistTextView = convertView.findViewById(R.id.artists);
+            viewHolder.downloadBtn = convertView.findViewById(R.id.downloadSongBtn);
             convertView.setTag(viewHolder);
         }else{
             viewHolder = (ViewHolder)convertView.getTag();
         }
         viewHolder.titleTextView.setText(track.getSong());
         viewHolder.artistTextView.setText(track.getArtists());
-        Picasso.with(mContext).load(track.getCover_image()).resize(42,42).placeholder(R.drawable.ic_audiotrack_black_48dp).into(viewHolder.trackImageView);
-        Picasso.with(mContext).setLoggingEnabled(true);
+        Glide.with(mContext).load(track.getCover_image()).thumbnail(0.01f).into(viewHolder.trackImageView);
+        viewHolder.downloadBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                DownloadSong downloadSong = new DownloadSong(mContext);
+                downloadSong.startDownload(track.getUrl());
+            }
+        });
         return convertView;
     }
 
@@ -67,5 +75,6 @@ public class SongTrackAdapter extends BaseAdapter {
         ImageView trackImageView;
         TextView titleTextView;
         TextView artistTextView;
+        ImageButton downloadBtn;
     }
 }

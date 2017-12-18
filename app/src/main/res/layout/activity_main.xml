@@ -7,6 +7,13 @@
     android:orientation="vertical"
     tools:context="com.tramboo.basit.olachallenge.MainActivity">
 
+    <android.support.v7.widget.SearchView
+        android:id="@+id/songSearchView"
+        android:layout_margin="4dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/rounded"/>
+
 
     <ListView
         android:id="@+id/track_list_view"
@@ -14,25 +21,21 @@
         android:layout_height="0dp"
         android:layout_weight="100"/>
 
+    <!--<android.support.v7.widget.RecyclerView
+        android:id="@+id/SongsRecyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>-->
+
 
     <android.support.v7.widget.Toolbar
         android:layout_width="match_parent"
-        android:layout_height="80dp"
+        android:layout_height="50dp"
         android:layout_marginEnd="8dp"
         android:layout_marginLeft="8dp"
         android:layout_marginStart="8dp"
         android:background="#f2f2f2"
         android:theme="@style/Base.ThemeOverlay.AppCompat.Dark.ActionBar">
 
-        <ImageView
-            android:id="@+id/selected_track_image"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:layout_marginRight="8dp"
-            android:adjustViewBounds="true"
-            android:background="@drawable/rounded"
-            android:backgroundTint="@color/bg_grey"
-            android:scaleType="centerCrop" />
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -48,6 +51,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Song Name"
+                android:textStyle="bold"
                 android:textColor="#000000"
                 android:textSize="16sp" />
 
@@ -55,8 +59,10 @@
                 android:id="@+id/selected_track_artist"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
+                android:layout_marginTop="3dp"
                 android:text="Artist Name"
+                android:textStyle="italic"
+                android:textSize="12sp"
                 android:textColor="@color/bg_dark_grey" />
 
         </LinearLayout>

@@ -4,6 +4,9 @@ import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ImageView;
@@ -11,7 +14,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.squareup.picasso.Picasso;
+
 import com.tramboo.basit.olachallenge.model.Songs;
 import com.tramboo.basit.olachallenge.network.NetworkServices;
 import com.tramboo.basit.olachallenge.network.RetrofitClient;
@@ -26,12 +29,16 @@ import retrofit2.Response;
 
 public class MainActivity extends AppCompatActivity {
     private List<Songs> mListItems;
+    private List<Songs> SearchedMusicList;
+    private ListView listView;
     private SongTrackAdapter mSongTrackerAdapter;
     private MediaPlayer mMediaPlayer;
     private ImageView mPlayerControl;
     private TextView mSelectedTrackTitle;
     private TextView mSelectedTrackArtist;
-    private ImageView mSelectedTrackImage;
+    private SearchView songSearchView;
+    private RecyclerView songsRecyclerView;
+    private SongAdapter mSongAdapter;
 
 
     @Override
@@ -56,12 +63,10 @@ public class MainActivity extends AppCompatActivity {
         });
 
         mListItems = new ArrayList<Songs>();
-        ListView listView = findViewById(R.id.track_list_view);
+        listView = findViewById(R.id.track_list_view);
         mSongTrackerAdapter = new SongTrackAdapter(this,mListItems);
         listView.setAdapter(mSongTrackerAdapter);
-
         mSelectedTrackTitle = findViewById(R.id.selected_track_title);
-        mSelectedTrackImage = findViewById(R.id.selected_track_image);
         mSelectedTrackArtist = findViewById(R.id.selected_track_artist);
         mPlayerControl = findViewById(R.id.player_control);
         mPlayerControl.setOnClickListener(new View.OnClickListener() {
@@ -74,11 +79,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Songs track = mListItems.get(position);
-
                 mSelectedTrackTitle.setText(track.getSong());
                 mSelectedTrackArtist.setText(track.getArtists());
-                Picasso.with(MainActivity.this).load(track.getCover_image()).placeholder(R.drawable.ic_audiotrack_black_48dp).into(mSelectedTrackImage);
-
                 if (mMediaPlayer.isPlaying()) {
                     mMediaPlayer.stop();
                     mMediaPlayer.reset();
@@ -94,7 +96,46 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+
+        /*mListItems = new ArrayList<Songs>();
+        songsRecyclerView = findViewById(R.id.SongsRecyclerView);
+        mSongAdapter = new SongAdapter(this,mListItems);
+        songsRecyclerView.setAdapter(mSongAdapter);
+        songsRecyclerView.setLayoutManager(new LinearLayoutManager(this));*/
+
+        SearchedMusicList = new ArrayList<>();
+        songSearchView = findViewById(R.id.songSearchView);
+        songSearchView.setQueryHint("Search...");
+        songSearchView.setIconifiedByDefault(false);
+        songSearchView.setFocusable(false);
+        songSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+               UpdateSongAdapter(newText);
+                return false;
+            }
+        });
+
+
+
         getSongs();
+    }
+
+    private void UpdateSongAdapter(String newText) {
+        SearchedMusicList.clear();
+        for (int i =0; i< mListItems.size(); i++){
+            Songs music = mListItems.get(i);
+            if (music.getSong().toLowerCase().startsWith(newText.toLowerCase())){
+                SearchedMusicList.add(music);
+            }
+        }
+        mSongTrackerAdapter = new SongTrackAdapter(this,SearchedMusicList);
+        listView.setAdapter(mSongTrackerAdapter);
     }
 
 
