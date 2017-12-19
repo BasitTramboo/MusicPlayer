@@ -1,7 +1,11 @@
 package com.tramboo.basit.olachallenge;
 
+import android.Manifest;
+import android.app.Activity;
+import android.content.pm.PackageManager;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -37,15 +41,19 @@ public class MainActivity extends AppCompatActivity {
     private TextView mSelectedTrackTitle;
     private TextView mSelectedTrackArtist;
     private SearchView songSearchView;
-    private RecyclerView songsRecyclerView;
-    private SongAdapter mSongAdapter;
+    // Storage Permissions
+    private static final int REQUEST_EXTERNAL_STORAGE = 1;
+    private static String[] PERMISSIONS_STORAGE = {
+            Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE
+    };
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        verifyStoragePermissions(this);
         mMediaPlayer = new MediaPlayer();
         mMediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
         mMediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
@@ -97,11 +105,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        /*mListItems = new ArrayList<Songs>();
-        songsRecyclerView = findViewById(R.id.SongsRecyclerView);
-        mSongAdapter = new SongAdapter(this,mListItems);
-        songsRecyclerView.setAdapter(mSongAdapter);
-        songsRecyclerView.setLayoutManager(new LinearLayoutManager(this));*/
 
         SearchedMusicList = new ArrayList<>();
         songSearchView = findViewById(R.id.songSearchView);
@@ -158,7 +161,10 @@ public class MainActivity extends AppCompatActivity {
                     if (response.body() != null) {
                         List<Songs> songs = response.body();
                         LoadTracks(songs);
+                    }else{
+                        Toast.makeText(MainActivity.this,"Seems like something went wrong",Toast.LENGTH_SHORT).show();
                     }
+
                 }else{
                     Toast.makeText(MainActivity.this,"Error Code: "+response.code(),Toast.LENGTH_SHORT).show();
                 }
@@ -196,4 +202,28 @@ public class MainActivity extends AppCompatActivity {
             mMediaPlayer = null;
         }
     }
+
+
+
+    /**
+     * Checks if the app has permission to write to device storage
+     *
+     * If the app does not has permission then the user will be prompted to grant permissions
+     *
+     * @param activity
+     */
+    public static void verifyStoragePermissions(Activity activity) {
+        // Check if we have write permission
+        int permission = ActivityCompat.checkSelfPermission(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+
+        if (permission != PackageManager.PERMISSION_GRANTED) {
+            // We don't have permission so prompt the user
+            ActivityCompat.requestPermissions(
+                    activity,
+                    PERMISSIONS_STORAGE,
+                    REQUEST_EXTERNAL_STORAGE
+            );
+        }
+    }
+
 }
