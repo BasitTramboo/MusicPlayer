@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="com.tramboo.basit.olachallenge.MainActivity">
+    tools:context="com.tramboo.basit.olachallenge.activity.MainActivity">
 
     <android.support.v7.widget.SearchView
         android:id="@+id/songSearchView"
@@ -20,11 +20,6 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="100"/>
-
-    <!--<android.support.v7.widget.RecyclerView
-        android:id="@+id/SongsRecyclerView"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"/>-->
 
 
     <android.support.v7.widget.Toolbar

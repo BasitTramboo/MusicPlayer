@@ -1,10 +1,10 @@
-package com.tramboo.basit.olachallenge;
+package com.tramboo.basit.olachallenge.common;
 
 import android.app.ProgressDialog;
 import android.content.Context;
 
 /**
- * Created by basit on 12/16/17.
+ * Created by basit on 12/19/17.
  */
 
 public class Progress_Dialog {

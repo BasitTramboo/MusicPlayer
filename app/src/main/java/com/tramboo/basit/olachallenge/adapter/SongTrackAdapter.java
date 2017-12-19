@@ -1,7 +1,11 @@
-package com.tramboo.basit.olachallenge;
+package com.tramboo.basit.olachallenge.adapter;
 
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Environment;
+import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,6 +16,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.tramboo.basit.olachallenge.R;
+import com.tramboo.basit.olachallenge.activity.MainActivity;
 import com.tramboo.basit.olachallenge.model.Songs;
 import com.tramboo.basit.olachallenge.network.NetworkServices;
 import com.tramboo.basit.olachallenge.network.RetrofitClient;
@@ -28,14 +34,19 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import static android.app.Notification.DEFAULT_LIGHTS;
+import static android.app.Notification.DEFAULT_SOUND;
+import static android.app.Notification.DEFAULT_VIBRATE;
+
 /**
- * Created by basit on 12/16/17.
+ * Created by basit on 12/19/17.
  */
 
 public class SongTrackAdapter extends BaseAdapter {
+    private static final String TAG = "SongAdapter";
     private Context mContext;
     private List<Songs> mTracks;
-
+    private NotificationCompat.Builder mBuilder;
     public SongTrackAdapter(Context mContext, List<Songs> mTracks) {
         this.mContext = mContext;
         this.mTracks = mTracks;
@@ -78,7 +89,9 @@ public class SongTrackAdapter extends BaseAdapter {
         viewHolder.downloadBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Songdownloader(track.getUrl(),track.getSong());
+                SongDownloader(track.getUrl(),track.getSong());
+                mBuilder = new NotificationCompat.Builder(mContext);
+                showNotification("Downloading Song...",track.getSong());
             }
         });
         return convertView;
@@ -91,25 +104,29 @@ public class SongTrackAdapter extends BaseAdapter {
         ImageButton downloadBtn;
     }
 
-    void Songdownloader(String fileurl, final String filename){
+   private void SongDownloader(String fileurl, final String filename){
         NetworkServices networkServices = RetrofitClient.getClient().create(NetworkServices.class);
         Call<ResponseBody> call = networkServices.downloadFileWithDynamicUrlSync(fileurl);
         call.enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                 if (response.isSuccessful()){
-                    Log.d("Call for download", "server contacted and has file");
+                    Log.d(TAG, "server contacted and has file");
                     boolean writtenToDisk = writeResponseBodyToDisk(response.body(),filename);
-                    Log.d("Call for download", "file download was a success? " + writtenToDisk);
+                    if (writtenToDisk){
+                        showNotification("Download Complete",filename);
+                    }
+                    Log.d(TAG, "file download was a success? " + writtenToDisk);
                 }
             }
 
             @Override
             public void onFailure(Call<ResponseBody> call, Throwable t) {
-                Log.d("Call for download", "failed");
+                showNotification("Download Failed",filename);
+                Log.d(TAG, "failed");
             }
         });
-    }
+   }
 
     private boolean writeResponseBodyToDisk(ResponseBody body,String filename) {
         try {
@@ -141,7 +158,7 @@ public class SongTrackAdapter extends BaseAdapter {
 
                     fileSizeDownloaded += read;
 
-                    Log.d("Call for downloadog", "file download: " + fileSizeDownloaded + " of " + fileSize);
+                    Log.d(TAG, "file download: " + fileSizeDownloaded + " of " + fileSize);
                 }
 
                 outputStream.flush();
@@ -161,5 +178,26 @@ public class SongTrackAdapter extends BaseAdapter {
         } catch (IOException e) {
             return false;
         }
+    }
+
+    private void showNotification(String message,String songName){
+        mBuilder.setSmallIcon(R.mipmap.ic_launcher)
+                .setContentTitle(songName)
+                .setContentText(message)
+                .setAutoCancel(true)
+                .setDefaults(DEFAULT_SOUND | DEFAULT_VIBRATE | DEFAULT_LIGHTS);
+
+        Intent intent = new Intent(mContext, MainActivity.class);
+        intent.setAction(Intent.ACTION_MAIN);
+        intent.addCategory(Intent.CATEGORY_LAUNCHER);
+
+        PendingIntent pendingIntent = PendingIntent.getActivity(mContext, (int)
+                System.currentTimeMillis(), intent, 0);
+        mBuilder.setContentIntent(pendingIntent);
+
+
+        NotificationManager mNotificationManager =
+                (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
+        mNotificationManager.notify(0, mBuilder.build());
     }
 }

@@ -1,9 +1,7 @@
 package com.tramboo.basit.olachallenge.model;
-
 /**
- * Created by basit on 12/16/17.
+ * Created by basit on 12/19/17.
  */
-
 public class Songs {
     public String song;
     public String url;

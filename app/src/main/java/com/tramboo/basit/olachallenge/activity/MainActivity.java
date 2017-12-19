@@ -1,4 +1,4 @@
-package com.tramboo.basit.olachallenge;
+package com.tramboo.basit.olachallenge.activity;
 
 import android.Manifest;
 import android.app.Activity;
@@ -8,8 +8,6 @@ import android.media.MediaPlayer;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.view.View;
 import android.widget.AdapterView;
@@ -19,6 +17,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 
+import com.tramboo.basit.olachallenge.common.Progress_Dialog;
+import com.tramboo.basit.olachallenge.R;
+import com.tramboo.basit.olachallenge.adapter.SongTrackAdapter;
 import com.tramboo.basit.olachallenge.model.Songs;
 import com.tramboo.basit.olachallenge.network.NetworkServices;
 import com.tramboo.basit.olachallenge.network.RetrofitClient;
@@ -30,6 +31,10 @@ import java.util.List;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+
+/**
+ * Created by basit on 12/19/17.
+ */
 
 public class MainActivity extends AppCompatActivity {
     private List<Songs> mListItems;
